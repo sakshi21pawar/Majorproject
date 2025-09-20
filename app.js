@@ -22,13 +22,16 @@ const ExpressError = require("./utils/ExpressError");
 
 const dbUrl=process.env.ATLASDB_URL
 // DB Connection
-main().then(() => {
-  console.log("Connected to DB");
-}).catch(err => console.log(err));
-
-async function main() {
-  await mongoose.connect(dbUrl);
-}
+mongoose.connect(dbUrl, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log("Connected to MongoDB Atlas");
+})
+.catch(err => {
+  console.error("MongoDB connection error:", err);
+});
 
 // Multer Setup for File Uploads
 const storage = multer.diskStorage({
@@ -45,6 +48,10 @@ const upload = multer({ storage });
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.engine("ejs", ejsMate);
+app.get("/", (req, res) => {
+  res.redirect("/listings"); // redirect to listings page
+});
+
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
